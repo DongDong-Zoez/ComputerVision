@@ -1,6 +1,16 @@
 from torch import nn
 import torch
 
+#TO DO:
+
+#1. In encoder part, use Conv2d replace MaxPool2d, and see how it works.
+#2. In decoder part, use ConvTranpose2d replace Upsample, and see how it works.
+
+#NOTE:
+
+#1. in_channels = 3 for RGB images
+#2. change out_channels to your custom setting
+
 class DownSampleLayer(nn.Module):
     
     def __init__(self, in_ch, out_ch):
