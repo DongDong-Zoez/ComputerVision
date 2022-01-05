@@ -116,29 +116,37 @@ class FullScaleUNet(nn.Module):
         super(FullScaleUNet, self).__init__()
         
         out_channels= [3,64,128,256,512,1024]
+        self.sigmoid = nn.Sigmoid()
         
         self.Encoder = nn.ModuleList(
             [DoubleConv(out_channels[i], out_channels[i+1], kernel_size=3, stride=1, padding=1) for i in range(num_encoders)]
         )
         
-        self.Decoder = DoubleConv(out_channels[1]*num_encoders, out_channels[1], kernel_size=3, stride=1, padding=1)
+        self.Decoder = DoubleConv(out_channels[1]*num_encoders, out_channels[1]*num_encoders, 
+                                  kernel_size=3, stride=1, padding=1)
         
         self.down = DownsampleLayer(mode='maxpooling', stride=2)
-        self.up = UpsampleLayer(mode='bilinear', scale_factor=2)
+        self.up = nn.ModuleList([UpsampleLayer(mode='bilinear', scale_factor=2**(i+1)) for i in range(num_encoders-1)])
         
         self.inter = nn.ModuleList([nn.ModuleList(
                                    [fullscale_connection(mode='down', scale_factor=2**(j+1), in_channels=out_channels[i+1], 
                                     out_channels=out_channels[1], kernel_size=3, stride=1, padding=1) 
                                     for i in range(num_encoders)]) for j in range(num_encoders-1)])
 
-        self.intra = nn.ModuleList([nn.ModuleList(
-                                   [fullscale_connection(mode='up', scale_factor=2**(j+1), in_channels=out_channels[i+1], 
-                                    out_channels=out_channels[1], kernel_size=3, stride=1, padding=1) 
-                                    for i in range(num_encoders)]) for j in range(num_encoders-1)])
+        self.intra = nn.ModuleList([fullscale_connection(mode='up', scale_factor=2**(j+1), 
+                                    in_channels=out_channels[1]*num_encoders, out_channels=out_channels[1], kernel_size=3, 
+                                    stride=1, padding=1) for j in range(num_encoders-1)])
+        
+        self.transition = nn.ModuleList([fullscale_connection(mode='up', scale_factor=2**(j+1),
+                                         in_channels=out_channels[num_encoders], out_channels=out_channels[1],
+                                         kernel_size=3, stride=1, padding=1) for j in range(num_encoders-1)])
         
         self.direct = nn.ModuleList([fullscale_connection(mode='direct', scale_factor=1, in_channels=out_channels[i+1],
                                      out_channels=out_channels[1], kernel_size=3, stride=1, padding=1)
                                      for i in range(num_encoders)])
+        
+        self.En_supervise = nn.Conv2d(out_channels[num_encoders], 3, kernel_size=3, stride=1, padding=1)
+        self.De_supervise = nn.Conv2d(out_channels[1]*num_encoders, 3, kernel_size=3, stride=1, padding=1)
 
         
     def forward(self, x):
@@ -149,13 +157,32 @@ class FullScaleUNet(nn.Module):
         e3 = self.Encoder[3](self.down(e2))
         e4 = self.Encoder[4](self.down(e3))
     
-        d3 = self.Decoder(torch.cat([self.intra[0][4](e4), self.direct[3](e3), self.inter[0][2](e2),
+        d3 = self.Decoder(torch.cat([self.transition[0](e4), self.direct[3](e3), self.inter[0][2](e2),
                                      self.inter[1][1](e1), self.inter[2][0](e0)], dim=1))
-        d2 = self.Decoder(torch.cat([self.intra[1][4](e4), self.intra[0][3](e3), self.direct[2](e2),
+        d2 = self.Decoder(torch.cat([self.transition[1](e4), self.intra[0](d3), self.direct[2](e2),
                                      self.inter[0][1](e1), self.inter[1][0](e0)], dim=1))
-        d1 = self.Decoder(torch.cat([self.intra[2][4](e4), self.intra[1][3](e3), self.intra[0][2](e2),
+        d1 = self.Decoder(torch.cat([self.transition[2](e4), self.intra[1](d3), self.intra[0](d2),
                                      self.direct[1](e1), self.inter[0][0](e0)], dim=1))
-        d0 = self.Decoder(torch.cat([self.intra[3][4](e4), self.intra[2][3](e3), self.intra[1][2](e2),
-                                     self.intra[0][1](e1), self.direct[0](e0)], dim=1))
+        d0 = self.Decoder(torch.cat([self.transition[3](e4), self.intra[2](d3), self.intra[1](d2),
+                                     self.intra[0](d1), self.direct[0](e0)], dim=1))
         
-        return d0
+        s4 = self.En_supervise(e4)
+        s4 = self.up[3](s4)
+        s4 = self.sigmoid(s4)
+        
+        s3 = self.De_supervise(d3)
+        s3 = self.up[2](s3)
+        s3 = self.sigmoid(s3)
+        
+        s2 = self.De_supervise(d2)
+        s2 = self.up[1](s2)
+        s2 = self.sigmoid(s2)
+        
+        s1 = self.De_supervise(d1)
+        s1 = self.up[0](s1) 
+        s1 = self.sigmoid(s1)
+        
+        s0 = self.De_supervise(d0)
+        s0 = self.sigmoid(s0)
+        
+        return s4, s3, s2, s1, s0
