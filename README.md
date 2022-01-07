@@ -11,4 +11,4 @@ A simple usage of UNet, UNet++, UNet+++ is to color the gray scale image, input 
 
 Convoulation autoencoder architecture are widely applied to Image Segmentation, input a iamge with label the boundary, the network will learn to partition the image.
 
-![UNet++ segmentation](https://github.com/DongDong-Zoez/ComputerVision/blob/main/colorNet_n.png)
+![UNet++ segmentation](https://github.com/DongDong-Zoez/ComputerVision/blob/main/Image%20Segmentation/UNet%2B%2B/segment.png)
