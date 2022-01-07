@@ -5,7 +5,7 @@ This repository  aims at realized easy network architecture
 
 A simple usage of UNet, UNet++, UNet+++ is to color the gray scale image, input a gray scale image and output a RGB image, the network will leran to color the image.
 
-![UNet with normalize](https://github.com/DongDong-Zoez/ComputerVision/blob/main/colorNet_n.png)
+![UNet with normalize](https://github.com/DongDong-Zoez/ComputerVision/blob/main/Image%20Segmentation/UNet/colorNet_n.png)
 
 ## Image Segmentation
 
