@@ -17,4 +17,4 @@ Convoulation autoencoder architecture are widely applied to Image Segmentation, 
 
 We apply state-of-the-art objective detection technique YOLOX on the city potholes dataset
 
-![YOLOX detection](Objective Detection/img-604_jpg.rf.becbd4b220417ce4d19186e23c348c41.jpg)
+![YOLOX detection](https://github.com/DongDong-Zoez/ComputerVision/blob/79875733078b656bfa8f3901e2f47fb31af4e853/Objective%20Detection/YOLOX_potholes.jpg)
