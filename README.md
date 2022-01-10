@@ -23,4 +23,6 @@ We apply state-of-the-art objective detection technique YOLOX on the city pothol
 
 DCGAN is the most widely applied GAN to generate image, we used DCGAN with four convolution layers
 
-![DCGAN56Epochs](https://github.com/DongDong-Zoez/ComputerVision/blob/cdfc4921e43b9e3ba2787882512cc59c05b57972/GAN/DCGAN/video.gif)
+<div style="width: 543px;height: 542px;overflow: hidden;">
+        <img src="https://github.com/DongDong-Zoez/ComputerVision/blob/cdfc4921e43b9e3ba2787882512cc59c05b57972/GAN/DCGAN/video.gif" style="margin-top: -87px; margin-left: -98px;">
+    </div>
