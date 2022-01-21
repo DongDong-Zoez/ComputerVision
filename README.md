@@ -29,4 +29,10 @@ DCGAN is the most widely applied GAN to generate image, we used DCGAN with four 
 
 ## Super-Resolution
 
+64*64 to 256*256
 
+- Fake HR: Generate image
+- HR: High resolution image
+- LR: Low resolution image
+
+![SRGAN](https://github.com/DongDong-Zoez/ComputerVision/blob/d2c75669b266404510c88870c80c922ef8790dd9/GAN/SRGAN.png)
