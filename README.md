@@ -26,3 +26,7 @@ DCGAN is the most widely applied GAN to generate image, we used DCGAN with four 
 <div style="width: 543px;height: 542px;overflow: hidden;">
     <img src="https://github.com/DongDong-Zoez/ComputerVision/blob/f5ed25e5be0f85c814135082c369b0d0802e7e9d/GAN/DCGAN/video.gif" style="margin-top: -87px; margin-left: -98px;">
 </div>
+
+## Super-Resolution
+
+
